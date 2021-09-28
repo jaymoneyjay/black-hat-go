@@ -6,6 +6,13 @@ import (
 	"net"
 )
 
+func main() {
+	target := "127.0.0.1"
+	maxPort := 1024
+	numWorkers := 100
+	scanTCP(target, maxPort, numWorkers)
+}
+
 func worker(ports, results chan int, target string) {
 	for p := range ports {
 		address := fmt.Sprintf("%s:%d", target, p)
@@ -19,24 +26,22 @@ func worker(ports, results chan int, target string) {
 	}
 }
 
-func main() {
-	TAR := "127.0.0.1"
-	MAXPORT := 1024
-	ports := make(chan int, 100)
+func scanTCP(target string, maxPort, numWorkers int) {
+	ports := make(chan int, numWorkers)
 	results := make(chan int)
 	var openports []int
 
 	for i:=0; i<=cap(ports); i++ {
-		go worker(ports, results, TAR)
+		go worker(ports, results, target)
 	}
 
 	go func() {
-		for i:=1; i<=MAXPORT; i++ {
+		for i:=1; i<=maxPort; i++ {
 			ports <- i
 		}
 	}()
 
-	for i:=0; i<MAXPORT; i++ {
+	for i:=0; i<maxPort; i++ {
 		port := <-results
 		if port != 0 {
 			openports = append(openports, port)
