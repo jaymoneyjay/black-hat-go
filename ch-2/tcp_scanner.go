@@ -15,7 +15,6 @@ func main() {
 	maxPort := 1024
 	numWorkers := 100
 	scanTCP(target, maxPort, numWorkers)
-	startProxy()
 }
 
 ////
